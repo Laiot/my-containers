@@ -2,7 +2,7 @@ FROM fedora:latest
 LABEL maintainer "Laiot <carmelo.sarta.main@gmail.com>"
 
 # Installing general dependencies
-RUN dnf install -y wget dpkg jemalloc-devel && \
+RUN dnf install -y wget dpkg jemalloc-devel openssl && \
     dnf group install -y "Development Tools"
 
 # Install Node LTS
