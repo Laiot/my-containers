@@ -1,18 +1,49 @@
 FROM fedora:latest
 LABEL maintainer "Laiot <carmelo.sarta.main@gmail.com>"
 
-# Install Node 
-## I really wanted to use nvm as I usually do but I'm having problem with using npm later on.
-## TODO edit and build from source
-RUN dnf install -y nodejs
+# Installing general dependencies
+RUN dnf install -y wget dpkg jemalloc-devel && \
+    dnf group install -y "Development Tools"
+
+# Install Node LTS
+ENV NODE_VER="18.12.1"
+RUN ARCH= && \
+    dpkgArch="$(dpkg --print-architecture)" && \
+    case "${dpkgArch##*-}" in \
+    amd64) ARCH='x64';; \
+    ppc64el) ARCH='ppc64le';; \
+    s390x) ARCH='s390x';; \
+    arm64) ARCH='arm64';; \
+    armhf) ARCH='armv7l';; \
+    i386) ARCH='x86';; \
+    *) echo "unsupported architecture"; exit 1 ;; \
+    esac && \
+    echo "Etc/UTC" > /etc/localtime && \
+    wget -q https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER-linux-$ARCH.tar.gz && \
+	tar xf node-v$NODE_VER-linux-$ARCH.tar.gz && \
+	rm node-v$NODE_VER-linux-$ARCH.tar.gz && \
+	mv node-v$NODE_VER-linux-$ARCH /opt/node
 
 # Install Ruby 
-RUN dnf install -y ruby
+ENV RUBY_VER="3.0.4"
+RUN wget https://cache.ruby-lang.org/pub/ruby/${RUBY_VER%.*}/ruby-$RUBY_VER.tar.gz && \
+	tar xf ruby-$RUBY_VER.tar.gz && \
+	cd ruby-$RUBY_VER && \
+	./configure --prefix=/opt/ruby \
+	  --with-jemalloc \
+	  --with-shared \
+	  --disable-install-doc && \
+	make -j"$(nproc)" > /dev/null && \
+	make install && \
+	rm -rf ../ruby-$RUBY_VER.tar.gz ../ruby-$RUBY_VER
+
+ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 
 # Install and Setup Node and Ruby necessary libraries
 RUN npm install -g npm@latest && \
 	npm install -g yarn && \
-	gem install bundler  
+	gem install bundler && \
+    mkdir /opt/mastodon 
 COPY Gemfile* package.json yarn.lock /opt/mastodon/
 RUN cd /opt/mastodon && \
     bundle config set --local deployment 'true' && \
