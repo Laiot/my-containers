@@ -1,4 +1,5 @@
 FROM fedora:latest
+LABEL maintainer "Laiot <carmelo.sarta.main@gmail.com>"
 
 # Install Node 
 ## I really wanted to use nvm as I usually do but I'm having problem with using npm later on.
@@ -11,7 +12,7 @@ RUN dnf install -y ruby
 # Install and Setup Node and Ruby necessary libraries
 RUN npm install -g npm@latest && \
 	npm install -g yarn && \
-	gem install bundler 
+	gem install bundler  
 COPY Gemfile* package.json yarn.lock /opt/mastodon/
 RUN cd /opt/mastodon && \
     bundle config set --local deployment 'true' && \
@@ -28,7 +29,6 @@ ENV PATH="${PATH}:/opt/mastodon/bin"
 # Create the mastodon user
 ARG UID=991
 ARG GID=991
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo "Etc/UTC" > /etc/localtime && \
 	addgroup --gid $GID mastodon && \
 	useradd -m -u $UID -g $GID -d /opt/mastodon mastodon && \
