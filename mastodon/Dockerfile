@@ -2,7 +2,7 @@ FROM fedora:latest
 LABEL maintainer "Laiot <carmelo.sarta.main@gmail.com>"
 
 # Installing general dependencies
-RUN dnf install -y wget dpkg jemalloc-devel openssl && \
+RUN dnf install -y wget dpkg jemalloc-devel openssl-devel && \
 	dnf group install -y "Development Tools"
 
 # Install Node LTS
@@ -32,7 +32,10 @@ RUN wget https://cache.ruby-lang.org/pub/ruby/${RUBY_VER%.*}/ruby-$RUBY_VER.tar.
 	./configure --prefix=/opt/ruby \
 	  --with-jemalloc \
 	  --with-shared \
-	  --disable-install-doc && \
+	  --disable-install-doc \	
+#	  --with-openssl-include=/path/to/openssl/headers \ 
+#	  --with-openssl-lib=/path/to/openssl/lib \
+	  --with-openssl-dir=/usr/bin/openssl && \
 	make -j"$(nproc)" > /dev/null && \
 	make install && \
 	rm -rf ../ruby-$RUBY_VER.tar.gz ../ruby-$RUBY_VER
