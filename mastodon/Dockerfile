@@ -2,9 +2,10 @@ FROM fedora:latest
 LABEL maintainer "Laiot <carmelo.sarta.main@gmail.com>"
 
 # Installing general dependencies
-RUN dnf install -y wget dpkg jemalloc-devel openssl-devel && \
+RUN dnf install -y wget dpkg jemalloc-devel ruby && \
 	dnf group install -y "Development Tools"
 
+# RUN which openssl
 # Install Node LTS
 ENV NODE_VER="18.12.1"
 RUN ARCH= && \
@@ -25,20 +26,20 @@ RUN ARCH= && \
 	mv node-v$NODE_VER-linux-$ARCH /opt/node
 
 # Install Ruby 
-ENV RUBY_VER="3.0.4"
-RUN wget https://cache.ruby-lang.org/pub/ruby/${RUBY_VER%.*}/ruby-$RUBY_VER.tar.gz && \
-	tar xf ruby-$RUBY_VER.tar.gz && \
-	cd ruby-$RUBY_VER && \
-	./configure --prefix=/opt/ruby \
-	  --with-jemalloc \
-	  --with-shared \
-	  --disable-install-doc \	
-#	  --with-openssl-include=/path/to/openssl/headers \ 
-#	  --with-openssl-lib=/path/to/openssl/lib \
-	  --with-openssl-dir=/usr/bin/openssl && \
-	make -j"$(nproc)" > /dev/null && \
-	make install && \
-	rm -rf ../ruby-$RUBY_VER.tar.gz ../ruby-$RUBY_VER
+# ENV RUBY_VER="3.0.4"
+# RUN wget https://cache.ruby-lang.org/pub/ruby/${RUBY_VER%.*}/ruby-$RUBY_VER.tar.gz && \
+# 	tar xf ruby-$RUBY_VER.tar.gz && \
+# 	cd ruby-$RUBY_VER && \
+# 	./configure --prefix=/opt/ruby \
+# 	  --with-jemalloc \
+# 	  --with-shared \
+# 	  --disable-install-doc \	
+# #	  --with-openssl-include=/path/to/openssl/headers \ 
+# #	  --with-openssl-lib=/path/to/openssl/lib \
+# 	  --with-openssl-dir=/usr/bin/openssl && \
+# 	make -j"$(nproc)" > /dev/null && \
+# 	make install && \
+# 	rm -rf ../ruby-$RUBY_VER.tar.gz ../ruby-$RUBY_VER
 
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 
