@@ -1,13 +1,16 @@
 FROM fedora:latest
 LABEL maintainer "Laiot <carmelo.sarta.main@gmail.com>"
 
+# Install dependencies and needed packages for downloading and installing Rust
 RUN dnf install -y gcc wget dpkg
 
+# Set environment variables
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
     RUST_VERSION=1.65.0
 
+# Check architecture, then download and install Rust
 RUN ARCH= && \
 	dpkgArch="$(dpkg --print-architecture)" && \
 	case "${dpkgArch##*-}" in \
