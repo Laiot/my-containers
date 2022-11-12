@@ -3,23 +3,23 @@ LABEL maintainer "Laiot <carmelo.sarta.main@gmail.com>"
 
 # Installing general dependencies
 RUN dnf install -y wget dpkg jemalloc-devel openssl && \
-    dnf group install -y "Development Tools"
+	dnf group install -y "Development Tools"
 
 # Install Node LTS
 ENV NODE_VER="18.12.1"
 RUN ARCH= && \
-    dpkgArch="$(dpkg --print-architecture)" && \
-    case "${dpkgArch##*-}" in \
-    amd64) ARCH='x64';; \
-    ppc64el) ARCH='ppc64le';; \
-    s390x) ARCH='s390x';; \
-    arm64) ARCH='arm64';; \
-    armhf) ARCH='armv7l';; \
-    i386) ARCH='x86';; \
-    *) echo "unsupported architecture"; exit 1 ;; \
-    esac && \
-    echo "Etc/UTC" > /etc/localtime && \
-    wget -q https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER-linux-$ARCH.tar.gz && \
+	dpkgArch="$(dpkg --print-architecture)" && \
+	case "${dpkgArch##*-}" in \
+	amd64) ARCH='x64';; \
+	ppc64el) ARCH='ppc64le';; \
+	s390x) ARCH='s390x';; \
+	arm64) ARCH='arm64';; \
+	armhf) ARCH='armv7l';; \
+	i386) ARCH='x86';; \
+	*) echo "unsupported architecture"; exit 1 ;; \
+	esac && \
+	echo "Etc/UTC" > /etc/localtime && \
+	wget -q https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER-linux-$ARCH.tar.gz && \
 	tar xf node-v$NODE_VER-linux-$ARCH.tar.gz && \
 	rm node-v$NODE_VER-linux-$ARCH.tar.gz && \
 	mv node-v$NODE_VER-linux-$ARCH /opt/node
@@ -43,12 +43,12 @@ ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 RUN npm install -g npm@latest && \
 	npm install -g yarn && \
 	gem install bundler && \
-    mkdir /opt/mastodon 
+	mkdir /opt/mastodon 
 COPY Gemfile* package.json yarn.lock /opt/mastodon/
 RUN cd /opt/mastodon && \
-    bundle config set --local deployment 'true' && \
-    bundle config set --local without 'development test' && \
-    bundle config set silence_root_warning true && \
+	bundle config set --local deployment 'true' && \
+	bundle config set --local without 'development test' && \
+	bundle config set silence_root_warning true && \
 	bundle install -j"$(nproc)" && \
 	yarn install --pure-lockfile
 
